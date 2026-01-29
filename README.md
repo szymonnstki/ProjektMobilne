@@ -11,8 +11,6 @@ Aplikacja korzysta z następujących uprawnień i sensorów:
 3.  **Aparat (Camera Intent):** Do wykonywania zdjęć dokumentujących pomiar.
 4.  **Pamięć urządzenia:** Do zapisu historii pomiarów w formacie JSON (trwałość danych).
 
-## [cite_start]Zrzuty ekranu [cite: 88]
-
 ### Ekran Główny
 <img width="189" height="395" alt="image" src="https://github.com/user-attachments/assets/28425fb3-ad67-4ec7-9f23-936abdcfb6c7" />
 
