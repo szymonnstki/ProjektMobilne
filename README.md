@@ -4,7 +4,7 @@ Aplikacja mobilna na platformę Android służąca do akwizycji danych środowis
 
 Projekt zrealizowany w ramach przedmiotu Programowanie urządzeń mobilnych.
 
-## [cite_start]Wykorzystane sensory i funkcje [cite: 86]
+## Wykorzystane sensory i funkcje 
 Aplikacja korzysta z następujących uprawnień i sensorów:
 1.  **GPS (Location Services):** Do pobierania szerokości i długości geograficznej.
 2.  **Mikrofon (MediaRecorder):** Do pomiaru amplitudy dźwięku i obliczania poziomu hałasu (dB).
@@ -20,7 +20,7 @@ Aplikacja korzysta z następujących uprawnień i sensorów:
 <img width="186" height="397" alt="image" src="https://github.com/user-attachments/assets/0cd6578c-83ef-4d3f-9dd8-c59a460d195b" />
 
 
-## [cite_start]Instrukcja uruchomienia [cite: 90]
+## Instrukcja uruchomienia 
 1. Pobierz plik `.apk` z sekcji Releases lub sklonuj repozytorium.
 2. Uruchom aplikację na telefonie z systemem Android (min. SDK 24).
 3. Zaakceptuj wymagane uprawnienia (Lokalizacja, Mikrofon, Aparat).
