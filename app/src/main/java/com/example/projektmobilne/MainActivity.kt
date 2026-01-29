@@ -1,5 +1,6 @@
 package com.example.projektmobilne
 
+import androidx.compose.material.icons.filled.Delete
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
@@ -266,7 +267,8 @@ fun HomeScreen(navController: NavController) {
 @Composable
 fun HistoryScreen(navController: NavController) {
     val context = LocalContext.current
-    val measurements = remember { DataManager.load(context) }
+    // Używamy stanu, aby lista odświeżała się natychmiast po usunięciu
+    var measurements by remember { mutableStateOf(DataManager.load(context)) }
 
     Scaffold(
         floatingActionButton = {
@@ -279,35 +281,60 @@ fun HistoryScreen(navController: NavController) {
             Text("Historia Pomiarów", style = MaterialTheme.typography.headlineSmall)
             Spacer(modifier = Modifier.height(8.dp))
 
-            LazyColumn {
-                items(measurements) { item ->
-                    Card(
-                        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
-                        elevation = CardDefaults.cardElevation(4.dp)
-                    ) {
-                        Row(modifier = Modifier.padding(16.dp)) {
-                            Column(modifier = Modifier.weight(1f)) {
-                                Text(text = "Data: ${item.date}", style = MaterialTheme.typography.bodySmall)
-                                Text(text = "Hałas: ${String.format("%.1f", item.noiseLevel)} dB")
-                                Text(text = "GPS: ${item.latitude}, ${item.longitude}")
-                            }
-
-                            // --- Dekodowanie poza UI ---
-                            item.imageBase64?.let { base64Str ->
-                                // 1. Najpierw dekodujemy bitmapę (logika)
-                                val bitmap = try {
-                                    val imageBytes = Base64.decode(base64Str, Base64.DEFAULT)
-                                    BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
-                                } catch (e: Exception) {
-                                    null
+            if (measurements.isEmpty()) {
+                Text("Brak zapisanych pomiarów.", style = MaterialTheme.typography.bodyMedium)
+            } else {
+                LazyColumn {
+                    items(measurements) { item ->
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 4.dp),
+                            elevation = CardDefaults.cardElevation(4.dp)
+                        ) {
+                            Row(
+                                modifier = Modifier
+                                    .padding(16.dp)
+                                    .fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically // Wyrównanie w pionie
+                            ) {
+                                // 1. Kolumna z tekstem (zajmuje większość miejsca)
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(text = "Data: ${item.date}", style = MaterialTheme.typography.bodySmall)
+                                    Text(text = "Hałas: ${String.format("%.1f", item.noiseLevel)} dB")
+                                    Text(text = "GPS: ${item.latitude}, ${item.longitude}")
                                 }
 
-                                // 2. Potem wyświetlamy, jeśli się udało (UI)
-                                bitmap?.let { bmp ->
-                                    Image(
-                                        bitmap = bmp.asImageBitmap(),
-                                        contentDescription = null,
-                                        modifier = Modifier.size(60.dp)
+                                // 2. Miniatura zdjęcia (jeśli jest)
+                                item.imageBase64?.let { base64Str ->
+                                    val bitmap = try {
+                                        val imageBytes = Base64.decode(base64Str, Base64.DEFAULT)
+                                        BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
+                                    } catch (e: Exception) { null }
+
+                                    bitmap?.let { bmp ->
+                                        Image(
+                                            bitmap = bmp.asImageBitmap(),
+                                            contentDescription = null,
+                                            modifier = Modifier
+                                                .size(50.dp)
+                                                .padding(end = 8.dp) // Odstęp od kosza
+                                        )
+                                    }
+                                }
+
+                                // 3. Przycisk usuwania (Kosz)
+                                IconButton(onClick = {
+                                    // Usuwamy z pliku
+                                    DataManager.delete(context, item)
+                                    // Odświeżamy listę na ekranie
+                                    measurements = DataManager.load(context)
+                                    Toast.makeText(context, "Usunięto wpis", Toast.LENGTH_SHORT).show()
+                                }) {
+                                    Icon(
+                                        imageVector = Icons.Default.Delete, // Upewnij się, że masz import
+                                        contentDescription = "Usuń",
+                                        tint = Color.Red // Czerwony kolor dla ostrzeżenia
                                     )
                                 }
                             }
@@ -343,6 +370,18 @@ object DataManager {
             gson.fromJson(json, type)
         } catch (e: Exception) {
             emptyList()
+        }
+    }
+
+    // --- NOWA FUNKCJA: Usuwanie pojedynczego elementu ---
+    fun delete(context: Context, measurementToDelete: Measurement) {
+        val currentList = load(context).toMutableList()
+        // Usuwamy element, który ma to samo ID
+        currentList.removeAll { it.id == measurementToDelete.id }
+
+        val json = gson.toJson(currentList)
+        context.openFileOutput(FILENAME, Context.MODE_PRIVATE).use {
+            it.write(json.toByteArray())
         }
     }
 }
