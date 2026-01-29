@@ -296,16 +296,16 @@ fun HistoryScreen(navController: NavController) {
                                 modifier = Modifier
                                     .padding(16.dp)
                                     .fillMaxWidth(),
-                                verticalAlignment = Alignment.CenterVertically // Wyrównanie w pionie
+                                verticalAlignment = Alignment.CenterVertically
                             ) {
-                                // 1. Kolumna z tekstem (zajmuje większość miejsca)
+                                // 1. Kolumna z tekstem
                                 Column(modifier = Modifier.weight(1f)) {
                                     Text(text = "Data: ${item.date}", style = MaterialTheme.typography.bodySmall)
                                     Text(text = "Hałas: ${String.format("%.1f", item.noiseLevel)} dB")
                                     Text(text = "GPS: ${item.latitude}, ${item.longitude}")
                                 }
 
-                                // 2. Miniatura zdjęcia (jeśli jest)
+                                // 2. Miniatura zdjęcia
                                 item.imageBase64?.let { base64Str ->
                                     val bitmap = try {
                                         val imageBytes = Base64.decode(base64Str, Base64.DEFAULT)
@@ -318,12 +318,12 @@ fun HistoryScreen(navController: NavController) {
                                             contentDescription = null,
                                             modifier = Modifier
                                                 .size(50.dp)
-                                                .padding(end = 8.dp) // Odstęp od kosza
+                                                .padding(end = 8.dp)
                                         )
                                     }
                                 }
 
-                                // 3. Przycisk usuwania (Kosz)
+                                // 3. Przycisk usuwania
                                 IconButton(onClick = {
                                     // Usuwamy z pliku
                                     DataManager.delete(context, item)
@@ -332,9 +332,9 @@ fun HistoryScreen(navController: NavController) {
                                     Toast.makeText(context, "Usunięto wpis", Toast.LENGTH_SHORT).show()
                                 }) {
                                     Icon(
-                                        imageVector = Icons.Default.Delete, // Upewnij się, że masz import
+                                        imageVector = Icons.Default.Delete,
                                         contentDescription = "Usuń",
-                                        tint = Color.Red // Czerwony kolor dla ostrzeżenia
+                                        tint = Color.Red
                                     )
                                 }
                             }
